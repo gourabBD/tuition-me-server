@@ -53,9 +53,20 @@ async function run(){
       const services=await cursor.toArray();
       res.send(services)
      })
+     app.get('/home',async(req,res)=>{
+      const query={}
+      const sort = { length: 1 };
+      const limit = 3;
+      serviceCollection.createIndex( { a: 1 } )
+      const cursor=serviceCollection.find(query).sort({ a: -1 }).limit(limit);
+      
+      const services=await cursor.toArray();
+      res.send(services)
+     })
      app.get('/review',async(req,res)=>{
       const query={}
-      const cursor=reviewCollection.find(query)
+      reviewCollection.createIndex( { a: 1 } )
+      const cursor=reviewCollection.find(query).sort({ a: -1 })
       const review=await cursor.toArray();
       res.send(review)
      })
@@ -75,14 +86,34 @@ async function run(){
       const result=await serviceCollection.insertOne(order)
       res.send(result)
      })
+     app.post('/review' , async(req,res)=>{
+      const review=req.body;
+      const result=await reviewCollection.insertOne(review)
+      res.send(result)
+     })
      //Update
-    
-    //  app.delete('/orders/:id',async(req,res)=>{
-    //   const id=req.params.id;
-    //   const query={_id: ObjectId(id)}
-    //   const result=await orderCollection.deleteOne(query)
-    //   res.send(result)
-    //  })
+     app.patch('/review/:id',async(req,res)=>{
+      const id= req.params.id;
+      const status = req.body.status
+      const query={_id : ObjectId(id)}
+      const updateDoc={
+        $set:{
+          status: status
+          
+        }
+      
+      }
+      const result =await reviewCollection.updateOne(query,updateDoc)
+      res.send(result)
+     })
+
+    //delete review
+     app.delete('/review/:id',async(req,res)=>{
+      const id=req.params.id;
+      const query={_id: ObjectId(id)}
+      const result=await reviewCollection.deleteOne(query)
+      res.send(result)
+     })
   }
   finally{
 
