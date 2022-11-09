@@ -1,14 +1,16 @@
 const express = require('express')
 const app = express()
 const cors = require('cors');
-
 const port = process.env.PORT || 5000;
+
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
 require('dotenv').config();
 
 //middle wares
 app.use(cors());
 app.use(express.json())
+
 
 
 
@@ -78,7 +80,7 @@ async function run(){
       res.send(service)
      })
 
-     //orders api create and get
+     //service api create and get
 
 
      app.post('/services' , async(req,res)=>{
@@ -92,14 +94,21 @@ async function run(){
       res.send(result)
      })
      //Update
+     app.get(`/review/:id`,async(req,res)=>{
+      const id=req.params.id;
+      const query={_id: ObjectId(id)}
+      const service = await reviewCollection.findOne(query);
+      res.send(service)
+     })
+
      app.patch('/review/:id',async(req,res)=>{
       const id= req.params.id;
-      const status = req.body.status
+      const userReview = req.body.userReview
       const query={_id : ObjectId(id)}
       const updateDoc={
         $set:{
-          status: status
-          
+          userReview: userReview
+
         }
       
       }
